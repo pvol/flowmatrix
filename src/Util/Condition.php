@@ -1,9 +1,9 @@
 <?php
 
-namespace Pvol\Flow\Util;
+namespace Pvol\FlowMatrix\Util;
 
-use Config,
-    Exception;
+use Pvol\FlowMatrix\Model;
+use Config,Exception;
 
 class Condition {
 
@@ -49,10 +49,10 @@ class Condition {
      */
     public static function checkFlowOwner($flow) {
 
-        $flow_mod = Flow::find($flow->flow_id);
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         
-        $user = \App\Models\User::info();
+        $user = User::info();
 
         if($user->name !== $flow_info['created_user']){
             throw new Exception("流程已接受！");
@@ -68,10 +68,10 @@ class Condition {
      */
     public static function checkAcceptCondition($flow) {
 
-        $flow_mod = Flow::find($flow->flow_id);
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         
-        $user = \App\Models\User::info();
+        $user = User::info();
         $accepted_users = explode(",", $flow_info['accepted_users']);
         if(in_array($user->name, $accepted_users)){
             throw new Exception("流程已接受！");
@@ -102,7 +102,7 @@ class Condition {
      */
     public static function checkDispatchCondition($flow, $accepted_user, $accepted_role) {
 
-        $flow_mod = Flow::find($flow->flow_id);
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         
         $current = $flow_info['current_step'];
@@ -127,8 +127,8 @@ class Condition {
      * 
      */
     public static function checkTransitionCondition($flow) {
-        $user = \App\Models\User::info();
-        $flow_mod = Flow::find($flow->flow_id);
+        $user = User::info();
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
 
         $accepted_users = explode(",", $flow_info['accepted_users']);

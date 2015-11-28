@@ -1,6 +1,6 @@
 <?php
 
-namespace Pvol\Flow\Traits;
+namespace Pvol\FlowMatrix\Traits;
 
 trait Factory {
     

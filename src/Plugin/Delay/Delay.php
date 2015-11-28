@@ -1,7 +1,8 @@
 <?php
 
-namespace Pvol\Flow\Plugin\Delay;
+namespace Pvol\FlowMatrix\Plugin\Delay;
 
+use Pvol\FlowMatrix\Model;
 use DB,Config;
 
 /**
@@ -20,7 +21,7 @@ class Delay {
      * 是不是延时者
      */
     public function isDelayMan($user) {
-        $flow = Flow::find($this->flow->flow_id);
+        $flow = Modle\Flow::find($this->flow->flow_id);
         $flow_attr = $flow->getAttributes();
         $accepted_users = explode(",", $flow_attr['accepted_users']);
         // 判断用户是否是当前流程的接收人
@@ -51,11 +52,11 @@ class Delay {
     public function saveReason($reason, $last_step, $next_processing_time) {
         
         // 保存位置
-        $flow = Flow::find($this->flow->flow_id);
+        $flow = Model\Flow::find($this->flow->flow_id);
         $flow_attr = $flow->getAttributes();
         $steps = Config::get('flow.' . $this->flow->tpl_name . '.steps');
         $runing_config = $steps[$flow_attr['current_step']];
-        Step::create(array(
+        Model\Step::create(array(
             'project_name' => $this->flow->tpl_name,
             'flow_id' => $this->flow->flow_id,
             'title' => $runing_config['title'],
@@ -67,7 +68,7 @@ class Delay {
             'created_user' => $user->name,
             'created_role' => $flow->running_role,
         ));
-        Step::find($last_step)->update([
+        Model\Step::find($last_step)->update([
             'next_processing_time' => $next_processing_time,
         ]);
         return true;

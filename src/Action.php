@@ -1,29 +1,36 @@
 <?php
 
-namespace Pvol\Flow;
+namespace Pvol\FlowMatrix;
 
 use Config;
+use Pvol\FlowMatrix\Model;
+use Pvol\FlowMatrix\Protocol;
+use Pvol\FlowMatrix\Util;
 
-class Action extends Pvol\Flow\Protocol\Action{
+class Action extends Protocol\Action{
 
-    // 新建
+    /** 
+     * 新建
+     */
     public function create() {
         return $this->publish();
     }
 
-    // 接受
+    /** 
+     * 接受
+     */
     public function accept() {
 
-        $flow_mod = Flow::find($this->flow->flow_id);
+        $flow_mod = Model\Flow::find($this->flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         $role_steps = Condition::getRunningStepsByRoles($this->flow->tpl_name, $flow_info['current_step'], array($this->flow->running_role));
         $this->flow->running_step = $role_steps[0]['step_index']; // 设置第一个可执行的步骤为当前步骤
         
         // 校验是否可以执行接受动作
-        Condition::checkAcceptCondition($this->flow);
+        Util\Condition::checkAcceptCondition($this->flow);
 
         // 跳转到指定步骤
-        Step::accept($this->flow);  
+        Util\Step::accept($this->flow);  
     }
     
     /** 
@@ -32,18 +39,20 @@ class Action extends Pvol\Flow\Protocol\Action{
     public function dispatch($accepted_user, $accepted_role) {
         
         // 校验是否可以执行分配动作
-        Condition::checkDispatchCondition($this->flow, $accepted_user, $accepted_role);
+        Util\Condition::checkDispatchCondition($this->flow, $accepted_user, $accepted_role);
         
         // 跳转到指定步骤
-        Step::dispatch($this->flow, $accepted_user, $accepted_role);  
+        Util\Step::dispatch($this->flow, $accepted_user, $accepted_role);  
         
     }
 
-    // 保存
+    /** 
+     * 保存
+     */
     public function storage() {
-        $user = \App\Models\User::info();
+        $user = Util\User::info();
         if (empty($this->flow->flow_id)) {
-            $flow = Flow::create(array(
+            $flow = Model\Flow::create(array(
                         'project_name' => $this->flow->tpl_name,
                         'current_status' => Status::NOTPUBLISH,
                         'accepted_users' => '',
@@ -57,9 +66,11 @@ class Action extends Pvol\Flow\Protocol\Action{
         return false;
     }
     
-    // 发布
+    /** 
+     * 发布
+     */
     public function publish() {
-        $user = \App\Models\User::info();
+        $user = Util\User::info();
         
         // 如果没有保存过，需要先保存
         $flow = false;
@@ -72,18 +83,18 @@ class Action extends Pvol\Flow\Protocol\Action{
         $next_key = $current['createto'];
         
         // 校验是否可以流转
-        Condition::checkFlowOwner(
+        Util\Condition::checkFlowOwner(
                 $this->flow
         );
         $now = date('Y-m-d H:i:s');
         $yzt_fileno = Config::get('yzt.config.file_num_start') . date("Ymd", strtotime($now)) . str_pad($this->flow->flow_id, 3, 0, STR_PAD_LEFT);
-        Flow::where('id', $this->flow->flow_id)->update(array(
+        Model\Flow::where('id', $this->flow->flow_id)->update(array(
                     'current_status' => Status::ARRIVED,
                     'current_step' => $next_key,
                     'created_at' => $now,
                     'yzt_fileno' => $yzt_fileno,
         ));
-        Step::create(array(
+        Util\Step::create(array(
             'project_name' => $this->flow->tpl_name,
             'flow_id' => $this->flow->flow_id,
             'title' => $current['title'],
@@ -98,55 +109,71 @@ class Action extends Pvol\Flow\Protocol\Action{
         return $flow;
     }
 
-    // 打回
+    /** 
+     * 打回
+     */
     public function back() {
         $this->turnTo('backto', Status::BACK);
     }
 
-    // 通过
+    /** 
+     * 通过
+     */
     public function next() {
         $this->turnTo('nextto', Status::NEXT);
     }
 
-    // 同意
+    /** 
+     * 同意
+     */
     public function agree() {
         $this->turnTo('agreeto', Status::AGREE);
     }
 
-    // 拒绝
+    /** 
+     * 拒绝
+     */
     public function reject() {
         $this->turnTo('rejectto', Status::REJECT);
     }
 
-    // 放弃
+    /** 
+     * 放弃
+     */
     public function abandon() {
         // 暂时无此功能，预留
     }
 
-    // 中断
+    /** 
+     * 终端
+     */
     public function suspend() {
         // 暂时不需要做任何操作，仅保存业务数据即可
     }
 
-    // 当前步骤完成，但是不影响其他
+    /**
+     * 当前步骤完成，但是不影响其他
+     */
     public function over() {
         
         // 校验是否可以流转
-        Condition::checkTransitionCondition(
+        Util\Condition::checkTransitionCondition(
                 $this->flow
         );
         
         // 结束当前步骤
-        Step::over(
+        Util\Step::over(
                 $this->flow
         );
     }
     
-    // 流转
+    /**
+     * 流转
+     */
     private function turnTo($dest_action, $dest_status){
         
         $flow_id = $this->flow->flow_id;
-        $flow = Flow::find($flow_id);
+        $flow = Model\Flow::find($flow_id);
         $flow_info = $flow->getAttributes();
         $from = $flow_info['current_step'];
         $steps = Config::get('flow.' . $this->flow->tpl_name . '.steps');
@@ -154,12 +181,12 @@ class Action extends Pvol\Flow\Protocol\Action{
         $to = $current_config[$dest_action];
         
         // 校验是否可以流转
-        Condition::checkTransitionCondition(
+        Util\Condition::checkTransitionCondition(
                 $this->flow
         );
         
         // 流转
-        Step::turnTo(
+        Util\Step::turnTo(
                 $this->flow,
                 $from, 
                 $to, 

@@ -1,5 +1,5 @@
 {
-    "name": "pvol/flow",
+    "name": "pvol/flow-matrix",
     "description": "A flow engine with powerful configuration function.",
     "type": "library",
     "keywords": ["flow","laravel"],
@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pvol\\flow\\": "src/lib/"
+            "Pvol\\flow-matrix\\": "src/"
         }
     },
     "minimum-stability": "dev"

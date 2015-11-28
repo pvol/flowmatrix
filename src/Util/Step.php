@@ -1,7 +1,8 @@
 <?php
 
-namespace Pvol\Flow\Util;
+namespace Pvol\FlowMatrix\Util;
 
+use Pvol\FlowMatrix\Model;
 use Config,DB,Log,Input,Request;
 
 class Step
@@ -35,9 +36,9 @@ class Step
      */
     public static function accept($flow){
         
-        $user = \App\Models\User::info();
+        $user = User::info();
 
-        $flow_mod = Flow::find($flow->flow_id);
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         $steps = Config::get('flow.' . $flow->tpl_name . '.steps');
         $runing_config = $steps[$flow->running_step];
@@ -61,7 +62,7 @@ class Step
             'accepted_users' => $new_accepted_users,
             'accepted_roles' => $new_accepted_roles
         ));
-        Step::create(array(
+        Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -83,17 +84,17 @@ class Step
      */
     public static function dispatch($flow, $accepted_user, $accepted_role) {
         
-        $user = \App\Models\User::info();
+        $user = User::info();
         
         $steps = Config::get('flow.' . $flow->tpl_name . '.steps');
         $runing_config = $steps[$flow->running_step];
         
-        Flow::where('id', $flow->flow_id)->update(array(
+        Model\Flow::where('id', $flow->flow_id)->update(array(
             'current_status' => Status::ACCEPT,
             'accepted_users' => $accepted_user,
             'accepted_roles' => $accepted_role,
         ));
-        Step::create(array(
+        Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -119,11 +120,11 @@ class Step
      */
     public static function turnTo($flow, $from, $to, $action_status) {
         
-        $user = \App\Models\User::info();
+        $user = User::info();
         $steps = Config::get('flow.' . $flow->tpl_name . '.steps');
         $to_config = $steps[$to];
         $runing_config = $steps[$flow->running_step];
-        $flow_mod = Flow::find($flow->flow_id);
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         
         // 如果当前流程执行方式为accept(先接受后执行)
@@ -201,7 +202,7 @@ class Step
         $data_json = urldecode($data_json);
         
         // 新增步骤执行记录
-        Step::create(array(
+        Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -228,8 +229,8 @@ class Step
      */
     public static function over($flow){
         
-        $user = \App\Models\User::info();
-        $flow_mod = Flow::find($flow->flow_id);
+        $user = User::info();
+        $flow_mod = Model\Flow::find($flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
         $steps = Config::get('flow.' . $flow->tpl_name . '.steps');
         $runing_config = $steps[$flow->running_step];
@@ -260,7 +261,7 @@ class Step
             'accepted_users' => $accepted_users,
             'accepted_roles' => $accepted_roles
         ));
-        Step::create(array(
+        Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -275,10 +276,10 @@ class Step
     }
     
     private static function addHooks($position){
-        $hooks = Config::get("flow.zyd.hooks");
+        $hooks = Config::get("flow" . $flow->tpl_name . "hooks");
         if (isset($hooks[$position])) {
             foreach ($hooks[$position] as $hook) {
-                if(is_subclass_of($hook, "Pvol\Flow\Hook")){
+                if(is_subclass_of($hook, "Pvol\FlowMatrix\Protocol\Hook")){
                     $hook::factory()->action($to, $to_status);
                 }
             }

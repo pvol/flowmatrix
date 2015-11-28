@@ -1,6 +1,6 @@
 <?php
 
-namespace Pvol\Flow\Model;
+namespace Pvol\FlowMatrix\Model;
 
 class Step extends Base
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pvol\Flow\Util;
+namespace Pvol\FlowMatrix\Util;
 
 class Status
 {

@@ -1,0 +1,25 @@
+{
+    "name": "pvol/flow",
+    "description": "A flow engine with powerful configuration function.",
+    "type": "library",
+    "keywords": ["flow","laravel"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "finepvol",
+            "email": "15726766@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "require-dev": {
+        "phpmd/phpmd" : "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pvol\\flow\\": "src/lib/"
+        }
+    },
+    "minimum-stability": "dev"
+}

@@ -19,7 +19,6 @@ class Flow{
     
     public function __construct(array $attributes = array()) {
         $this->init($attributes);
-        parent::__construct($attributes);
     }
     
     /**

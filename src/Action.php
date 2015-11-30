@@ -23,7 +23,7 @@ class Action extends Protocol\Action{
 
         $flow_mod = Model\Flow::find($this->flow->flow_id);
         $flow_info = $flow_mod->getAttributes();
-        $role_steps = Condition::getRunningStepsByRoles($this->flow->tpl_name, $flow_info['current_step'], array($this->flow->running_role));
+        $role_steps = Util\Condition::getRunningStepsByRoles($this->flow->tpl_name, $flow_info['current_step'], array($this->flow->running_role));
         $this->flow->running_step = $role_steps[0]['step_index']; // 设置第一个可执行的步骤为当前步骤
         
         // 校验是否可以执行接受动作
@@ -54,7 +54,7 @@ class Action extends Protocol\Action{
         if (empty($this->flow->flow_id)) {
             $flow = Model\Flow::create(array(
                         'project_name' => $this->flow->tpl_name,
-                        'current_status' => Status::NOTPUBLISH,
+                        'current_status' => Util\Status::NOTPUBLISH,
                         'accepted_users' => '',
                         'accepted_roles' => '',
                         'current_step' => 'apply',
@@ -89,12 +89,12 @@ class Action extends Protocol\Action{
         $now = date('Y-m-d H:i:s');
         $yzt_fileno = Config::get('yzt.config.file_num_start') . date("Ymd", strtotime($now)) . str_pad($this->flow->flow_id, 3, 0, STR_PAD_LEFT);
         Model\Flow::where('id', $this->flow->flow_id)->update(array(
-                    'current_status' => Status::ARRIVED,
+                    'current_status' => Util\Status::ARRIVED,
                     'current_step' => $next_key,
                     'created_at' => $now,
                     'yzt_fileno' => $yzt_fileno,
         ));
-        Util\Step::create(array(
+        Model\Step::create(array(
             'project_name' => $this->flow->tpl_name,
             'flow_id' => $this->flow->flow_id,
             'title' => $current['title'],
@@ -102,7 +102,7 @@ class Action extends Protocol\Action{
             'content' => '',
             'real_content' => '',
             'step' => $current_key,
-            'status' => Status::CREATE,
+            'status' => Util\Status::CREATE,
             'created_user' => $user->name,
             'created_role' => $this->flow->running_role,
         ));
@@ -113,28 +113,28 @@ class Action extends Protocol\Action{
      * 打回
      */
     public function back() {
-        $this->turnTo('backto', Status::BACK);
+        $this->turnTo('backto', Util\Status::BACK);
     }
 
     /** 
      * 通过
      */
     public function next() {
-        $this->turnTo('nextto', Status::NEXT);
+        $this->turnTo('nextto', Util\Status::NEXT);
     }
 
     /** 
      * 同意
      */
     public function agree() {
-        $this->turnTo('agreeto', Status::AGREE);
+        $this->turnTo('agreeto', Util\Status::AGREE);
     }
 
     /** 
      * 拒绝
      */
     public function reject() {
-        $this->turnTo('rejectto', Status::REJECT);
+        $this->turnTo('rejectto', Util\Status::REJECT);
     }
 
     /** 

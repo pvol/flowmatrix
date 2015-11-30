@@ -2,9 +2,12 @@
 
 namespace Pvol\FlowMatrix\Protocol;
 
+use Pvol\FlowMatrix\Traits\Factory;
+use Pvol\FlowMatrix\Flow;
+
 abstract class Action
 {
-    use Pvol\FlowMatrix\Traits\Factory;
+    use Factory;
     
     protected $flow;
 

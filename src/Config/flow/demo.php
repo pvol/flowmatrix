@@ -9,9 +9,9 @@ return [
         'step1'=>[
             'title' => 'step1',
             'action' => [ // 执行的动作,系统默认动作在Action中提供，也可以自定义
-                'App\Library\Flow\Action@create',   // 新建
-                'App\Library\Flow\Action@storage',   // 保存
-                'App\Library\Flow\Action@publish',   // 发布
+                'Pvol\FlowMatrix\Action@create',   // 新建
+                'Pvol\FlowMatrix\Action@storage',   // 保存
+                'Pvol\FlowMatrix\Action@publish',   // 发布
             ],
             'roles' => [ // 什么角色可以执行
                 'channel'
@@ -24,8 +24,8 @@ return [
         'step2'=>[
             'title' => 'step2',
             'action' => [ // 执行的动作,系统默认动作在Action中提供，也可以自定义
-                'App\Library\Flow\Action@accept', // 接受
-                'App\Library\Flow\Action@over', // 完成
+                'Pvol\FlowMatrix\Action@accept', // 接受
+                'Pvol\FlowMatrix\Action@over', // 完成
             ],
             'roles' => [ // 什么角色可以执行
                 'front_control'

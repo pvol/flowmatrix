@@ -50,6 +50,9 @@ class Condition {
     public static function checkFlowOwner($flow) {
 
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         
         $user = User::info();
@@ -69,6 +72,9 @@ class Condition {
     public static function checkAcceptCondition($flow) {
 
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         
         $user = User::info();
@@ -103,6 +109,9 @@ class Condition {
     public static function checkDispatchCondition($flow, $accepted_user, $accepted_role) {
 
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         
         $current = $flow_info['current_step'];
@@ -129,6 +138,9 @@ class Condition {
     public static function checkTransitionCondition($flow) {
         $user = User::info();
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
 
         $accepted_users = explode(",", $flow_info['accepted_users']);

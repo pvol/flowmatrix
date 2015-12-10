@@ -3,7 +3,7 @@
 namespace Pvol\FlowMatrix\Util;
 
 use Pvol\FlowMatrix\Model;
-use Config,DB,Log,Input,Request;
+use Config,DB,Log,Input,Request,Exception;
 
 class Step
 {
@@ -39,6 +39,9 @@ class Step
         $user = User::info();
 
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         $steps = Config::get('flow.' . $flow->tpl_name . '.steps');
         $runing_config = $steps[$flow->running_step];
@@ -125,6 +128,9 @@ class Step
         $to_config = $steps[$to];
         $runing_config = $steps[$flow->running_step];
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         
         // 如果当前流程执行方式为accept(先接受后执行)
@@ -231,6 +237,9 @@ class Step
         
         $user = User::info();
         $flow_mod = Model\Flow::find($flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         $steps = Config::get('flow.' . $flow->tpl_name . '.steps');
         $runing_config = $steps[$flow->running_step];

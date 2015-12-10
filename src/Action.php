@@ -2,7 +2,7 @@
 
 namespace Pvol\FlowMatrix;
 
-use Config;
+use Config,Exception;
 use Pvol\FlowMatrix\Model;
 use Pvol\FlowMatrix\Protocol;
 use Pvol\FlowMatrix\Util;
@@ -22,6 +22,9 @@ class Action extends Protocol\Action{
     public function accept() {
 
         $flow_mod = Model\Flow::find($this->flow->flow_id);
+        if(empty($flow_mod)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow_mod->getAttributes();
         $role_steps = Util\Condition::getRunningStepsByRoles($this->flow->tpl_name, $flow_info['current_step'], array($this->flow->running_role));
         $this->flow->running_step = $role_steps[0]['step_index']; // 设置第一个可执行的步骤为当前步骤
@@ -174,6 +177,9 @@ class Action extends Protocol\Action{
         
         $flow_id = $this->flow->flow_id;
         $flow = Model\Flow::find($flow_id);
+        if(empty($flow)){
+            throw new Exception("流程id不存在");
+        }
         $flow_info = $flow->getAttributes();
         $from = $flow_info['current_step'];
         $steps = Config::get('flow.' . $this->flow->tpl_name . '.steps');

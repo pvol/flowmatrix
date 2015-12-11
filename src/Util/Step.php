@@ -223,7 +223,7 @@ class Step
         ));
         
         // 添加hook
-        self::addHooks("after_step", $flow->flow_id, $step->id, $to, $action_status);
+        self::addHooks("after_step", $flow, $step, $from, $action_status);
     }
     
     /** 
@@ -284,12 +284,12 @@ class Step
         ));
     }
     
-    private static function addHooks($position, $flow_id, $step_id, $to, $action_status){
-        $hooks = Config::get("flow" . $flow->tpl_name . "hooks");
+    private static function addHooks($position, $flow, $step, $from, $action_status){
+        $hooks = $flow->config['hooks'];
         if (isset($hooks[$position])) {
             foreach ($hooks[$position] as $hook) {
                 if(is_subclass_of($hook, "Pvol\FlowMatrix\Protocol\Hook\AfterStep")){
-                    $hook::factory()->action($flow_id, $step_id, $to, $action_status);
+                    $hook::factory()->action($flow->flow_id, $step->id, $from, $action_status);
                 }
             }
         }

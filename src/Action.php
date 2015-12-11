@@ -97,7 +97,7 @@ class Action extends Protocol\Action{
                     'created_at' => $now,
                     'yzt_fileno' => $yzt_fileno,
         ));
-        Model\Step::create(array(
+        $step = Model\Step::create(array(
             'project_name' => $this->flow->tpl_name,
             'flow_id' => $this->flow->flow_id,
             'title' => $current['title'],
@@ -109,6 +109,8 @@ class Action extends Protocol\Action{
             'created_user' => $user->name,
             'created_role' => $this->flow->running_role,
         ));
+        // 添加hook
+        Util\Step::addHooks("after_step", $this->flow, $step, ZYD_STEP_APPLY, Util\Status::CREATE);
         return $flow;
     }
 

@@ -65,7 +65,7 @@ class Step
             'accepted_users' => $new_accepted_users,
             'accepted_roles' => $new_accepted_roles
         ));
-        Model\Step::create(array(
+        $step = Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -77,6 +77,8 @@ class Step
             'created_user' => $user->name,
             'created_role' => $flow->running_role,
         ));
+        // 添加hook
+        self::addHooks("after_step", $flow, $step, $flow->running_step, Status::ACCEPT);
     }
     
     /** 
@@ -284,7 +286,7 @@ class Step
         ));
     }
     
-    private static function addHooks($position, $flow, $step, $from, $action_status){
+    public static function addHooks($position, $flow, $step, $from, $action_status){
         $hooks = $flow->config['hooks'];
         if (isset($hooks[$position])) {
             foreach ($hooks[$position] as $hook) {

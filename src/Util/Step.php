@@ -99,7 +99,7 @@ class Step
             'accepted_users' => $accepted_user,
             'accepted_roles' => $accepted_role,
         ));
-        Model\Step::create(array(
+        $step = Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -111,6 +111,8 @@ class Step
             'created_user' => $user->name,
             'created_role' => $flow->running_role,
         ));
+        // 添加hook
+        self::addHooks("after_step", $flow, $step, $flow->running_step, Status::DISPATCH);
     }
     
     /** 

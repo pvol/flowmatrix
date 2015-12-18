@@ -78,7 +78,7 @@ class Step
             'created_role' => $flow->running_role,
         ));
         // 添加hook
-        self::addHooks("after_step", $flow, $step, $flow->running_step, Status::ACCEPT);
+        self::addHooks("after_step", $flow, $step, $flow->running_step, $flow->running_step, Status::ACCEPT);
     }
     
     /** 
@@ -112,7 +112,7 @@ class Step
             'created_role' => $flow->running_role,
         ));
         // 添加hook
-        self::addHooks("after_step", $flow, $step, $flow->running_step, Status::DISPATCH);
+        self::addHooks("after_step", $flow, $step, $flow->running_step, $flow->running_step, Status::DISPATCH);
     }
     
     /** 
@@ -227,11 +227,11 @@ class Step
         ));
         
         // 添加hook
-        self::addHooks("after_step", $flow, $step, $from, $action_status);
+        self::addHooks("after_step", $flow, $step, $from, $to, $action_status);
     }
     
     /** 
-     * 流程接受
+     * 流程关闭
      * 
      * @param project_name 项目名称
      * @param flow lib/flow类
@@ -274,7 +274,7 @@ class Step
             'accepted_users' => $accepted_users,
             'accepted_roles' => $accepted_roles
         ));
-        Model\Step::create(array(
+        $step = Model\Step::create(array(
             'project_name' => $flow->tpl_name,
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
@@ -286,15 +286,18 @@ class Step
             'created_user' => $user->name,
             'created_role' => $flow->running_role,
         ));
+        
+        // 添加hook
+        self::addHooks("after_step", $flow, $step, $flow->running_step, $flow->running_step, Status::OVER);
     }
     
-    public static function addHooks($position, $flow, $step, $from, $action_status){
+    public static function addHooks($position, $flow, $step, $from, $to, $action_status){
         $hooks = $flow->config['hooks'];
         if (isset($hooks[$position])) {
             foreach ($hooks[$position] as $hook) {
                 if(is_subclass_of($hook, "Pvol\FlowMatrix\Protocol\Hook\AfterStep")){
                     try{
-                        $hook::factory()->action($flow->flow_id, $step->id, $from, $action_status);
+                        $hook::factory()->action($flow->flow_id, $step->id, $from, $to, $action_status);
                     }catch(Exception $e){
                         Log::info($e);
                     }

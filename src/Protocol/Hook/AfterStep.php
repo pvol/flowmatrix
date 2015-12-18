@@ -7,6 +7,6 @@ use Pvol\FlowMatrix\Protocol\Hook;
 abstract class AfterStep extends Hook
 {
     
-    public abstract function action($flow_id, $step_id, $step_mame, $status);
+    public abstract function action($flow_id, $step_id, $from_step, $to_step, $to_status);
   
 }

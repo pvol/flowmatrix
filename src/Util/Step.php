@@ -104,7 +104,7 @@ class Step
             'flow_id' => $flow->flow_id,
             'title' => $runing_config['title'],
             'real_title' => $runing_config['title'],
-            'content' => '',
+            'content' => '已分配至' . $accepted_user,
             'real_content' => '已分配至' . $accepted_user,
             'step' => $flow->running_step,
             'status' => Status::DISPATCH,

@@ -20,7 +20,7 @@ class Status
     
     
     public static $map = array(
-        self::CREATE => "流程创建", 
+        self::CREATE => "流程发布", 
         self::ARRIVED => "流程到达", 
         self::ACCEPT => "流程接受", 
         self::BACK => "流程驳回",
@@ -32,6 +32,7 @@ class Status
         self::OVER => "当前步骤完成",
         self::DISPATCH => "流程分配",
         self::DELAY => "流程操作超时",
+        self::NOTPUBLISH => "流程录入",
     );
     
     public static function map(){

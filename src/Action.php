@@ -64,6 +64,22 @@ class Action extends Protocol\Action{
                         'created_user' => $user->name,
             ));
             $this->flow->flow_id = $flow->id;
+            $steps = Config::get('flow.' . $this->flow->tpl_name . '.steps');
+            $current = current($steps);
+            $current_key = key($steps);
+            $step = Model\Step::create(array(
+                'project_name' => $this->flow->tpl_name,
+                'flow_id' => $this->flow->flow_id,
+                'title' => $current['title'],
+                'real_title' => $current['title'],
+                'content' => '新录入',
+                'real_content' => '新录入',
+                'step' => $current_key,
+                'status' => Util\Status::NOTPUBLISH,
+                'created_user' => $user->name,
+                'created_role' => $this->flow->running_role,
+            ));
+            Util\Step::addHooks("after_step", $this->flow, $step, ZYD_STEP_APPLY, ZYD_STEP_APPLY, Util\Status::NOTPUBLISH);
             return $flow;
         }
         return false;
@@ -102,8 +118,8 @@ class Action extends Protocol\Action{
             'flow_id' => $this->flow->flow_id,
             'title' => $current['title'],
             'real_title' => $current['title'],
-            'content' => '',
-            'real_content' => '',
+            'content' => '新申请',
+            'real_content' => '新申请',
             'step' => $current_key,
             'status' => Util\Status::CREATE,
             'created_user' => $user->name,

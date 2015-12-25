@@ -3,7 +3,8 @@
 namespace Pvol\FlowMatrix\Util;
 
 use Pvol\FlowMatrix\Model;
-use Config,DB,Log,Input,Request,Exception;
+use Config,DB,Log,Exception;
+use Illuminate\Support\Arr;
 
 class Step
 {
@@ -192,8 +193,8 @@ class Step
             $to_accepted_roles = implode(',', $from_accepted_roles);
         }
         
-        $content = Input::get('content');
-        $real_content = Input::get('real_content');
+        $content = Arr::get($flow->request, 'content');
+        $real_content = Arr::get($flow->request, 'real_content');
         
         // 更新流程主表
         $flow_mod->update(array(
@@ -203,8 +204,7 @@ class Step
             'accepted_roles' => $to_accepted_roles
         ));
 
-        $request = Request::all();
-        $data = $request['data'];
+        $data = Arr::get($flow->request, 'data');
         foreach($data as &$item){
             $item = urlencode($item);
         }
@@ -267,8 +267,8 @@ class Step
             $accepted_roles = array_flip($accepted_roles_reverse);
             $accepted_roles = implode(',', $accepted_roles);
         }
-        $content = Input::get('content');
-        $real_content = Input::get('real_content');
+        $content = Arr::get($flow->request, 'content');
+        $real_content = Arr::get($flow->request, 'real_content');
 
         $flow_mod->update(array(
             'accepted_users' => $accepted_users,

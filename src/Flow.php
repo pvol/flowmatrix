@@ -40,6 +40,9 @@ class Flow{
         if (isset($params['running_step'])) {
             $this->running_step = $params['running_step'];
         }
+        if (isset($params['request'])) {
+            $this->request = $params['request'];
+        }
     }
 
     /**

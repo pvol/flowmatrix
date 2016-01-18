@@ -200,10 +200,15 @@ class Action extends Protocol\Action{
         }
         $flow_info = $flow->getAttributes();
         $from = $flow_info['current_step'];
-        $steps = Config::get('flow.' . $this->flow->tpl_name . '.steps');
-        $current_config = $steps[$from];
-        $to = $current_config[$dest_action];
-        
+        // 目标步骤获取优先级 页面手动设置>系统配置
+        if(isset($this->flow->request['dest'])){ 
+            $to = $this->flow->request['dest']['dest_step'];
+            $dest_status = $this->flow->request['dest']['dest_status'];
+        } else {
+            $steps = Config::get('flow.' . $this->flow->tpl_name . '.steps');
+            $current_config = $steps[$from];
+            $to = $current_config[$dest_action];
+        }
         // 校验是否可以流转
         Util\Condition::checkTransitionCondition(
                 $this->flow

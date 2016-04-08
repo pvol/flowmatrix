@@ -3,6 +3,8 @@
 namespace Pvol\FlowMatrix\Plugin\Delay;
 
 use Pvol\FlowMatrix\Model;
+use Pvol\FlowMatrix\Util;
+use Pvol\FlowMatrix\Flow;
 use DB,Config,Exception;
 
 /**
@@ -21,7 +23,7 @@ class Delay {
      * 是不是延时者
      */
     public function isDelayMan($user) {
-        $flow = Modle\Flow::find($this->flow->flow_id);
+        $flow = Model\Flow::find($this->flow->flow_id);
         if(empty($flow)){
             throw new Exception("流程id不存在");
         }
@@ -70,7 +72,7 @@ class Delay {
             'content' => '',
             'real_content' => $reason,
             'step' => $flow_attr['current_step'],
-            'status' => Status::DELAY,
+            'status' => Util\Status::DELAY,
             'created_user' => $user->name,
             'created_role' => $flow->running_role,
         ));
